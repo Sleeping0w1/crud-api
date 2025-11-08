@@ -1,6 +1,6 @@
 import http from 'node:http';
 import dotenv from 'dotenv';
-import { Users } from './users';
+import { Users } from './users.ts';
 
 dotenv.config();
 
