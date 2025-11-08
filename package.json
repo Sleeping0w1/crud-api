@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "main": "dist/server.js",
   "private": true,
+  "type": "module",
   "scripts": {
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
