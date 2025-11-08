@@ -7,6 +7,7 @@ import sonarjs from 'eslint-plugin-sonarjs';
 import prettier from 'eslint-plugin-prettier';
 import stylistic from '@stylistic/eslint-plugin';
 import unicorn from 'eslint-plugin-unicorn';
+import globals from 'globals';
 
 export default [
   {
@@ -18,6 +19,9 @@ export default [
       parser: tsParser,
       parserOptions: {
         project: './tsconfig.json',
+      },
+      globals: {
+        ...globals.node,
       },
     },
     plugins: {
@@ -39,7 +43,7 @@ export default [
       ...importPlugin.configs.typescript.rules,
 
       'no-plusplus': 'off',
-      'no-console': 'warn',
+      'no-console': 'off',
       'class-methods-use-this': 'off',
       'max-len': ['warn', { code: 120 }],
       '@stylistic/semi': 'error',
@@ -90,6 +94,14 @@ export default [
         {
           selector: 'default',
           format: ['camelCase'],
+        },
+        {
+          selector: 'objectLiteralProperty',
+          format: null,
+          filter: {
+            regex: '^Content-Type$',
+            match: true,
+          },
         },
         {
           selector: 'variable',

@@ -11,20 +11,20 @@ export class User {
 
 export class Users {
   private static _users: Map<string, User> = new Map();
-  constructor(startUsers?: Array<User>) {
+  public static init(startUsers?: Array<User>): void {
     if (Users._users.size === 0 && startUsers) {
       startUsers.forEach(user => {
         Users.addUser(user);
       });
     }
   }
-  public static addUser(user: User) {
+  public static addUser(user: User): void {
     if (this._users.has(user.id)) {
       throw new Error(`User with ID ${user.id} already exists`);
     }
     this._users.set(user.id, user);
   }
-  public static updateUser(user: User) {
+  public static updateUser(user: User): User {
     if (!this._users.has(user.id)) {
       throw new Error(`User with ID ${user.id} not found`);
     }

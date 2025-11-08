@@ -1,22 +1,24 @@
 import http from 'node:http';
 import dotenv from 'dotenv';
 import { Users } from './users.ts';
+import { basicPort, HTTP_STATUS_NOT_FOUND, HTTP_STATUS_OK } from './constants.ts';
 
 dotenv.config();
 
-const PORT = process.env.PORT || 3000;
+
+const PORT = process.env.PORT || basicPort;
 const HOST = process.env.HOST || 'localhost';
 
-new Users();
+Users.init();
 
 const server = http.createServer(function (request, response) {
   const { method, url } = request;
   if (url === '/users' && method === 'GET') {
     const allUsers = Users.getUsers();
-    response.writeHead(200, { 'Content-Type': 'application/json' });
+    response.writeHead(HTTP_STATUS_OK, { 'Content-Type': 'application/json' });
     response.end(JSON.stringify(allUsers));
   } else {
-    response.writeHead(404, { 'Content-Type': 'application/json' });
+    response.writeHead(HTTP_STATUS_NOT_FOUND, { 'Content-Type': 'application/json' });
     response.end(JSON.stringify({
       error: 'Page not found',
       message: `Route ${method} ${url} not found`,
