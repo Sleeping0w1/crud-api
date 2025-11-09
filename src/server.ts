@@ -5,6 +5,7 @@ import {
   basicPort,
   HTTP_BAD_REQUEST,
   HTTP_STATUS_CREATED,
+  HTTP_STATUS_NO_CONTENT,
   HTTP_STATUS_NOT_FOUND,
   HTTP_STATUS_OK,
 } from './constants.ts';
@@ -68,6 +69,18 @@ const server = http.createServer(function (request, response) {
         );
       }
     });
+  } else if (url?.startsWith('/users/') && method === 'DELETE') {
+    const id = url.split('/')[2];
+    if (!validateUUID(id, response)) {
+      return;
+    }
+    if (Users.removeUser(id)) {
+      response.writeHead(HTTP_STATUS_NO_CONTENT, { 'Content-Type': 'application/json' });
+      response.end();
+    } else {
+      response.writeHead(HTTP_STATUS_NOT_FOUND, { 'Content-Type': 'application/json' });
+      response.end(JSON.stringify({ error: 'Invalid userId', message: `record with id = ${id} doesn't exist` }));
+    }
   } else if (url?.startsWith('/users') && method === 'POST') {
     let body = '';
     request.on('data', (chunk: Buffer) => {
