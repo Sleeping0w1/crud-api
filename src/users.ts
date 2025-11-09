@@ -6,7 +6,11 @@ export interface UserData {
   hobbies: Array<string>;
 }
 
-function isUserData(data: unknown): data is UserData {
+export interface UserDataWithId extends UserData {
+  id: string;
+}
+
+export function isUserData(data: unknown): data is UserData {
   return (
     data !== null &&
     typeof data === 'object' &&
@@ -17,6 +21,10 @@ function isUserData(data: unknown): data is UserData {
     typeof data.age === 'number' &&
     Array.isArray(data.hobbies)
   );
+}
+
+export function isUserDataWithId(data: unknown): data is UserDataWithId {
+  return isUserData(data) && 'id' in data && typeof data.id === 'number';
 }
 
 export class User {
@@ -63,7 +71,7 @@ export class Users {
     }
     this._users.set(user.id, user);
   }
-  public static updateUser(user: User): User {
+  public static updateUser(user: UserDataWithId): User {
     if (!this._users.has(user.id)) {
       throw new Error(`User with ID ${user.id} not found`);
     }
