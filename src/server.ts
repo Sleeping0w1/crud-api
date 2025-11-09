@@ -1,15 +1,9 @@
 import http from 'node:http';
 import dotenv from 'dotenv';
-import { isUserData, User, Users } from './users.ts';
-import {
-  basicPort,
-  HTTP_BAD_REQUEST,
-  HTTP_STATUS_CREATED,
-  HTTP_STATUS_NO_CONTENT,
-  HTTP_STATUS_NOT_FOUND,
-  HTTP_STATUS_OK,
-} from './constants.ts';
-import { validateUUID } from './validateUUID.ts';
+import { basicPort, HTTP_STATUS_INTERNAL_SERVER_ERROR } from './constants.ts';
+import { Users } from './users.ts';
+import { createUser, deleteUser, getAllUsers, getUserById, notFound, updateUser } from './endpointsHandlers.ts';
+import { errorResponse } from './ApiResponses.ts';
 
 dotenv.config();
 
@@ -19,106 +13,48 @@ const HOST = process.env.HOST || 'localhost';
 await Users.initializeFromJSON('./src/users.json');
 
 const server = http.createServer(function (request, response) {
-  const { method, url } = request;
-  if (url === '/users' && method === 'GET') {
-    const allUsers = Users.getUsers();
-    response.writeHead(HTTP_STATUS_OK, { 'Content-Type': 'application/json' });
-    response.end(JSON.stringify(allUsers));
-  } else if (url?.startsWith('/users/') && method === 'GET') {
-    const id = url.split('/')[2];
-    if (!validateUUID(id, response)) {
-      return;
-    }
-    const user = Users.getUserById(id);
-    if (user) {
-      response.writeHead(HTTP_STATUS_OK, { 'Content-Type': 'application/json' });
-      response.end(JSON.stringify(user));
-    } else {
-      response.writeHead(HTTP_STATUS_NOT_FOUND, { 'Content-Type': 'application/json' });
-      response.end(JSON.stringify({ error: 'Invalid userId', message: `record with id = ${id} doesn't exist` }));
-    }
-    return;
-  } else if (url?.startsWith('/users/') && method === 'PUT') {
-    const id = url.split('/')[2];
-    let body = '';
-    request.on('data', (chunk: Buffer) => {
-      body += chunk.toString();
-    });
-    request.on('end', () => {
-      if (!validateUUID(id, response)) {
-        return;
-      }
-      const data: unknown = JSON.parse(body);
-      if (isUserData(data)) {
-        const userDataWithId = { ...data, id };
-        const user = Users.updateUser(userDataWithId);
-        if (user) {
-          response.writeHead(HTTP_STATUS_OK, { 'Content-Type': 'application/json' });
-          response.end(JSON.stringify(user));
-        } else {
-          response.writeHead(HTTP_STATUS_NOT_FOUND, { 'Content-Type': 'application/json' });
-          response.end(JSON.stringify({ error: 'Invalid userId', message: `record with id = ${id} doesn't exist` }));
+  try {
+    const { method, url } = request;
+
+    if (url === '/users') {
+      switch (method) {
+        case 'GET': {
+          getAllUsers(response);
+          return;
         }
-      } else {
-        response.writeHead(HTTP_BAD_REQUEST, { 'Content-Type': 'application/json' });
-        response.end(
-          JSON.stringify({
-            error: 'Invalid user data',
-            message: 'Please provide valid user data including username, age, and optional hobbies',
-          })
-        );
+        case 'POST': {
+          createUser(request, response);
+          return;
+        }
       }
-    });
-  } else if (url?.startsWith('/users/') && method === 'DELETE') {
-    const id = url.split('/')[2];
-    if (!validateUUID(id, response)) {
+    }
+
+    if (url?.startsWith('/users/')) {
+      const id = url.split('/')[2];
+
+      switch (method) {
+        case 'GET':
+          getUserById(response, id);
+          break;
+        case 'PUT':
+          updateUser(request, response, id);
+          break;
+        case 'DELETE':
+          deleteUser(response, id);
+          break;
+        default:
+          notFound(response, method, url);
+      }
       return;
     }
-    if (Users.removeUser(id)) {
-      response.writeHead(HTTP_STATUS_NO_CONTENT, { 'Content-Type': 'application/json' });
-      response.end();
-    } else {
-      response.writeHead(HTTP_STATUS_NOT_FOUND, { 'Content-Type': 'application/json' });
-      response.end(JSON.stringify({ error: 'Invalid userId', message: `record with id = ${id} doesn't exist` }));
-    }
-  } else if (url?.startsWith('/users') && method === 'POST') {
-    let body = '';
-    request.on('data', (chunk: Buffer) => {
-      body += chunk.toString();
-    });
-    request.on('end', () => {
-      const data: unknown = JSON.parse(body);
-      if (isUserData(data)) {
-        const user = Users.addUser(new User(data.username, data.age, data.hobbies));
-        response.writeHead(HTTP_STATUS_CREATED, { 'Content-Type': 'application/json' });
-        response.end(JSON.stringify(user));
-      } else {
-        response.writeHead(HTTP_BAD_REQUEST, { 'Content-Type': 'application/json' });
-        response.end(
-          JSON.stringify({
-            error: 'Invalid user data',
-            message: 'Please provide valid user data including username, age, and optional hobbies',
-          })
-        );
-      }
-    });
-  } else {
-    response.writeHead(HTTP_STATUS_NOT_FOUND, { 'Content-Type': 'application/json' });
-    response.end(
-      JSON.stringify({
-        error: 'Page not found',
-        message: `Route ${method} ${url} not found`,
-        availableRoutes: [
-          'GET /users',
-          'GET /users/{userId}',
-          'POST /users',
-          'PUT /users/{userId}',
-          'DELETE /users/{userId}',
-        ],
-      })
-    );
+
+    notFound(response, method, url);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    errorResponse(response, HTTP_STATUS_INTERNAL_SERVER_ERROR, 'Server error', errorMessage);
   }
 });
+
 server.listen(PORT, function () {
   console.log(`Сервер запущен по адресу http://${HOST}:${PORT}`);
 });
