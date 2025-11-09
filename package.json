@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "main": "dist/server.js",
   "private": true,
+  "type": "module",
   "scripts": {
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
@@ -19,13 +20,15 @@
   "devDependencies": {
     "@stylistic/eslint-plugin": "^3.1.0",
     "@types/jest": "^30.0.0",
-    "@types/node": "^22.13.11",
+    "@types/node": "^22.19.0",
+    "@types/supertest": "^6.0.3",
     "@types/uuid": "^9.0.0",
     "@typescript-eslint/eslint-plugin": "^8.46.3",
     "@typescript-eslint/parser": "^8.46.3",
     "cross-env": "^7.0.3",
     "eslint": "^9.22.0",
     "eslint-config-prettier": "^10.1.8",
+    "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-optimize-regex": "^1.2.1",
     "eslint-plugin-prettier": "^5.2.3",
@@ -35,6 +38,7 @@
     "jest": "^30.2.0",
     "nodemon": "^3.1.9",
     "prettier": "^3.5.3",
+    "supertest": "^7.1.4",
     "ts-jest": "^29.4.5",
     "ts-node": "^10.9.0",
     "typescript": "^5.8.3",
@@ -42,7 +46,7 @@
     "webpack-cli": "^6.0.1"
   },
   "dependencies": {
-    "dotenv": "^16.4.5",
+    "dotenv": "^16.6.1",
     "uuid": "^9.0.0"
   }
 }
