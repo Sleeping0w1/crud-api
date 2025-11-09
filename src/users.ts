@@ -65,11 +65,9 @@ export class Users {
       throw error;
     }
   }
-  public static addUser(user: User): void {
-    if (this._users.has(user.id)) {
-      throw new Error(`User with ID ${user.id} already exists`);
-    }
+  public static addUser(user: User): User {
     this._users.set(user.id, user);
+    return user;
   }
   public static updateUser(user: UserDataWithId): User | undefined {
     if (!this._users.has(user.id)) {

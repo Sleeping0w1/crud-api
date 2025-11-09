@@ -1,7 +1,13 @@
 import http from 'node:http';
 import dotenv from 'dotenv';
-import { isUserData, Users } from './users.ts';
-import { basicPort, HTTP_BAD_REQUEST, HTTP_STATUS_NOT_FOUND, HTTP_STATUS_OK } from './constants.ts';
+import { isUserData, User, Users } from './users.ts';
+import {
+  basicPort,
+  HTTP_BAD_REQUEST,
+  HTTP_STATUS_CREATED,
+  HTTP_STATUS_NOT_FOUND,
+  HTTP_STATUS_OK,
+} from './constants.ts';
 import { validateUUID } from './validateUUID.ts';
 
 dotenv.config();
@@ -52,6 +58,27 @@ const server = http.createServer(function (request, response) {
           response.writeHead(HTTP_STATUS_NOT_FOUND, { 'Content-Type': 'application/json' });
           response.end(JSON.stringify({ error: 'Invalid userId', message: `record with id = ${id} doesn't exist` }));
         }
+      } else {
+        response.writeHead(HTTP_BAD_REQUEST, { 'Content-Type': 'application/json' });
+        response.end(
+          JSON.stringify({
+            error: 'Invalid user data',
+            message: 'Please provide valid user data including username, age, and optional hobbies',
+          })
+        );
+      }
+    });
+  } else if (url?.startsWith('/users') && method === 'POST') {
+    let body = '';
+    request.on('data', (chunk: Buffer) => {
+      body += chunk.toString();
+    });
+    request.on('end', () => {
+      const data: unknown = JSON.parse(body);
+      if (isUserData(data)) {
+        const user = Users.addUser(new User(data.username, data.age, data.hobbies));
+        response.writeHead(HTTP_STATUS_CREATED, { 'Content-Type': 'application/json' });
+        response.end(JSON.stringify(user));
       } else {
         response.writeHead(HTTP_BAD_REQUEST, { 'Content-Type': 'application/json' });
         response.end(
