@@ -81,7 +81,7 @@ export class Users {
   }
   public static getUserById(id: string): User | undefined {
     if (!this._users.has(id)) {
-      throw new Error(`User with ID ${id} not found`);
+      return undefined;
     }
     return this._users.get(id);
   }

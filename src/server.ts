@@ -1,8 +1,8 @@
 import http from 'node:http';
 import dotenv from 'dotenv';
-import { validate as validateUUID } from 'uuid';
 import {  Users } from './users.ts';
-import { basicPort, HTTP_BAD_REQUEST, HTTP_STATUS_NOT_FOUND, HTTP_STATUS_OK } from './constants.ts';
+import { basicPort, HTTP_STATUS_NOT_FOUND, HTTP_STATUS_OK } from './constants.ts';
+import { validateUUID } from './validateUUID.ts';
 
 dotenv.config();
 
@@ -19,14 +19,7 @@ const server = http.createServer(function (request, response) {
     response.end(JSON.stringify(allUsers));
   } else if (url?.startsWith('/users/') && method === 'GET') {
     const id = url.split('/')[2];
-    if (!validateUUID(id)) {
-      response.writeHead(HTTP_BAD_REQUEST, { 'Content-Type': 'application/json' });
-      response.end(
-        JSON.stringify({
-          error: 'Invalid userId format',
-          message: 'UserId must be a valid UUID',
-        })
-      );
+    if (!validateUUID(id, response)) {
       return;
     }
     const user = Users.getUserById(id);
