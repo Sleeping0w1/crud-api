@@ -10,6 +10,16 @@ const HOST = process.env.HOST || 'localhost';
 
 const BASE_URL = `http://${HOST}:${PORT}`;
 
+beforeAll(() => {
+  console.log('🚀 ===========================================');
+  console.log('🚀 Starting API Tests');
+  console.log('🚀 Make sure the server is running with:');
+  console.log('🚀 npm run start:dev');
+  console.log('🚀 Server should be available at:');
+  console.log(`🚀 ${BASE_URL}`);
+  console.log('🚀 ===========================================\n');
+});
+
 describe('Basic API Tests', () => {
   it('should return 404 for non-existent routes', async () => {
     const response = await request(BASE_URL).get('/non-existent-route').expect(404);
