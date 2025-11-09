@@ -71,9 +71,9 @@ export class Users {
     }
     this._users.set(user.id, user);
   }
-  public static updateUser(user: UserDataWithId): User {
+  public static updateUser(user: UserDataWithId): User | undefined {
     if (!this._users.has(user.id)) {
-      throw new Error(`User with ID ${user.id} not found`);
+      return undefined;
     }
     this._users.set(user.id, user);
     return user;
