@@ -1,0 +1,27 @@
+[
+  {
+    "username": "john_doe",
+    "age": 28,
+    "hobbies": ["reading", "hiking", "photography"]
+  },
+  {
+    "username": "emma_wilson", 
+    "age": 32,
+    "hobbies": ["yoga", "cooking", "traveling"]
+  },
+  {
+    "username": "alex_chen",
+    "age": 25, 
+    "hobbies": ["gaming", "coding", "music"]
+  },
+  {
+    "username": "sarah_miller",
+    "age": 30,
+    "hobbies": ["painting", "dancing", "movies"]
+  },
+  {
+    "username": "mike_johnson",
+    "age": 35,
+    "hobbies": ["sports", "fitness", "chess"]
+  }
+]
